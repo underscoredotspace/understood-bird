@@ -4,12 +4,12 @@
 	"description": "What am I about?",
 	"main": "server.js",
 	"scripts": {
+    "install": "bower install",
 		"start": "node server.js"
 	},
 	"dependencies": {
 		"express": "^4.15.2",
-		"snoowrap": "^1.12.0",
 		"request": "^2.81.0",
-		"body-parser": "^1.17.1"
+		"bower": "^1.8.0"
 	}
 }

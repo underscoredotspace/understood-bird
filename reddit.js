@@ -1,7 +1,7 @@
 var request = require('request')
-var accessToken = null
+var _accessToken = null
 
-var newAccessToken = (cb) => {
+var _newAccessToken = (cb) => {
   var options = {
     url: 'https://www.reddit.com/api/v1/access_token', 
     method: 'POST',
@@ -12,24 +12,53 @@ var newAccessToken = (cb) => {
   request(options, function(err, response, body) {
     var oBody = JSON.parse(body)
     setTimeout(() => {
-      accessToken = null
-    }, (Number(oBody.expires_in) * 1000) - 1000)
+      _accessToken = null
+    }, (Number(oBody.expires_in) * 1000) - 10000)
     
-    accessToken = oBody.access_token
+    _accessToken = oBody.access_token
 
-    if (cb) cb(accessToken)
+    if (cb) cb(_accessToken)
   })
 }
 
-var getAccessToken =(cb) => {
-  if (!accessToken) {
-    newAccessToken((token)=>{
-      cb(accessToken)
+var access_token =(cb) => {
+  if (!_accessToken) {
+    // Request a new token from Reddit, the old one expired or will do in a minute
+    _newAccessToken((token)=>{
+      cb(_accessToken)
     })
   } else {
-    console.log({saved: accessToken})
-    cb(accessToken)
+    // Token already requested from Reddit, still valid
+    cb(_accessToken)
   }
 }
 
-module.exports = {getAccessToken}
+var _apiRequest = (which, cb) => {
+  access_token((token)=>{
+    var options = {
+      url: 'https://oauth.reddit.com' + which,
+      auth: {bearer: token},
+      headers: {
+        'User-Agent': 'https://glitch.me/~understood-bird by /u/_DotSpace'
+      }
+    }
+
+    request(options, (err, res, body)=>{
+      cb(JSON.parse(body))
+    })
+  })
+}
+
+var getComments = (reddit, postid, cb) => {
+  _apiRequest('/r/' + reddit + '/comments/' + postid, (res)=>{
+    cb(res)
+  })
+}
+
+var getSubReddit = (reddit, cb) => {
+  _apiRequest('/r/' + reddit, (res)=>{
+    cb(res)
+  })
+}
+
+module.exports = {access_token, getSubReddit, getComments}

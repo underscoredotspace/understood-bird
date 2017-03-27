@@ -1,8 +1,11 @@
 <html>
   <head>
     <title>Home!</title>
+    <script src="/bower_components/angularjs/angular.min.js"></script>
   </head>
-  <body>
-    <a href="/token">Get Token</a>
+  <body ng-app="reddit">
+    <a href="/r/askreddit">Ask Reddit</a>
+    <button r-sub="askreddit">Ask Reddit</button>
+    <script src="client.js"></script>
   </body>
 </html>
